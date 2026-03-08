@@ -1,0 +1,131 @@
+{
+  "dropdowns": {
+    "tankType": [
+      "Concrete",
+      "Plastic",
+      "Fiberglass",
+      "Steel",
+      "Unknown"
+    ],
+    "tankCapacity": [
+      "500 gallon",
+      "750 gallon",
+      "1000 gallon",
+      "1500 gallon",
+      "2000 gallon"
+    ],
+    "pumpStation": [
+      "In-Tank",
+      "Separate",
+      "No"
+    ],
+    "pumpCondition": [
+      "Operational",
+      "Not operational",
+      "Unable to verify"
+    ],
+    "highWaterAlarm": [
+      "Present and functional",
+      "Present but not functional",
+      "Not present",
+      "Unable to locate alarm panel"
+    ],
+    "inletBaffle": [
+      "Good condition",
+      "Deteriorated",
+      "Missing",
+      "Unable to inspect"
+    ],
+    "outletBaffle": [
+      "Good condition",
+      "Deteriorated",
+      "Missing",
+      "Unable to inspect"
+    ],
+    "inletPipe": [
+      "Good condition",
+      "Sag observed",
+      "Roots present",
+      "Crack or break observed",
+      "Unable to inspect"
+    ],
+    "outletPipe": [
+      "Good condition",
+      "Sag observed",
+      "Roots present",
+      "Crack or break observed",
+      "Unable to inspect"
+    ],
+    "effluentLevel": [
+      "Normal",
+      "High",
+      "Low",
+      "Tank was full"
+    ],
+    "tankPumped": [
+      "Yes",
+      "No - seasonal conditions",
+      "No - recently pumped",
+      "No - other reason"
+    ],
+    "leachfieldType": [
+      "Pipe and Stone",
+      "Infiltrators",
+      "Enviroseptic Tubes",
+      "Eljin Indrain"
+    ],
+    "testPitFindings": [
+      "No biomat in soil or pooling of effluent",
+      "Biomat in soil",
+      "Pooling of effluent",
+      "Biomat and effluent present in soil"
+    ],
+    "vegetation": [
+      "Clear and maintained",
+      "Overgrowth present - maintenance recommended",
+      "Trees or large shrubs present - removal recommended"
+    ]
+  },
+  "labels": {
+    "tankNotes": "Other Notes",
+    "leachfieldNotes": "Other Notes"
+  },
+  "sectionHeaders": {},
+  "customFields": [],
+  "customSections": [],
+  "sectionOrder": [
+    "headerInfo",
+    "septicTank",
+    "leachfield",
+    "hheDesign",
+    "recommendations",
+    "photos"
+  ],
+  "fieldOrder": {
+    "headerInfo": [
+      "customerName",
+      "jobAddress"
+    ],
+    "septicTank": [
+      "tankType",
+      "pumpStation",
+      "highWaterAlarm",
+      "effluentLevel",
+      "lastPumped",
+      "inletBaffle",
+      "inletPipe",
+      "custom_1772979358617_m3wzd",
+      "tankNotes"
+    ],
+    "leachfield": [
+      "leachfieldType",
+      "vegetation",
+      "leachfieldNotes",
+      "custom_1772979471819_scrar"
+    ],
+    "recommendations": [
+      "recommendations"
+    ]
+  },
+  "hiddenFields": []
+}

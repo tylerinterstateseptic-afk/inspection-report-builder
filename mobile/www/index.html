@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ISS Inspection</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="lib/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-brand">
+      <h1>Interstate Septic Systems</h1>
+      <span class="top-bar-tagline">Inspection Report Builder</span>
+    </div>
+    <div class="top-bar-actions">
+      <button onclick="showDraftsModal()">Drafts</button>
+      <button onclick="saveDraft()">Save</button>
+      <button onclick="showSettingsModal()">Settings</button>
+    </div>
+  </div>
+
+  <!-- Tab Buttons -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabBtnSeptic" onclick="switchTab('septic')">Septic Inspection</button>
+    <button class="tab-btn" id="tabBtnSewer" onclick="switchTab('sewer')">Sewer Camera Inspection</button>
+  </div>
+
+  <div class="main-container">
+
+    <!-- =================== SEPTIC TAB ============================= -->
+    <div id="septicTab">
+
+      <!-- ===== HEADER INFO ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Header Info <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="customerName" placeholder="John & Jane Doe">
+            </div>
+            <div class="form-group">
+              <label>Inspector</label>
+              <input type="text" id="inspectorName" value="Tyler Fish" readonly style="background:#eee;color:#555;">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Job Site Address</label>
+              <input type="text" id="jobAddress" placeholder="123 Main St, Town, State">
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="inspectionDate">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEPTIC TANK ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Septic Tank <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tank Type</label>
+              <select id="tankType" onchange="toggleOtherField(this, 'tankTypeOther')">
+                <option value="">-- Select --</option>
+                <option>Concrete</option>
+                <option>Plastic</option>
+                <option>Fiberglass</option>
+                <option>Steel</option>
+                <option>Unknown</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="tankTypeOther" class="other-input hidden" placeholder="Specify tank type...">
+            </div>
+            <div class="form-group">
+              <label>Tank Capacity</label>
+              <select id="tankCapacity" onchange="toggleOtherField(this, 'tankCapacityOther')">
+                <option value="">-- Select --</option>
+                <option>500 gallon</option>
+                <option>750 gallon</option>
+                <option>1000 gallon</option>
+                <option>1500 gallon</option>
+                <option>2000 gallon</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="tankCapacityOther" class="other-input hidden" placeholder="Specify capacity...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pump Station</label>
+              <select id="pumpStation" onchange="togglePumpFields()">
+                <option value="">-- Select --</option>
+                <option>In-Tank</option>
+                <option>Separate</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div class="form-group hidden" id="pumpConditionGroup">
+              <label>Pump Condition</label>
+              <select id="pumpCondition" onchange="toggleOtherField(this, 'pumpConditionOther')">
+                <option value="">-- Select --</option>
+                <option>Operational</option>
+                <option>Not operational</option>
+                <option>Unable to verify</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="pumpConditionOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row single hidden" id="highWaterAlarmGroup">
+            <div class="form-group">
+              <label>High Water Alarm</label>
+              <select id="highWaterAlarm" onchange="toggleOtherField(this, 'highWaterAlarmOther')">
+                <option value="">-- Select --</option>
+                <option>Present and functional</option>
+                <option>Present but not functional</option>
+                <option>Not present</option>
+                <option>Unable to locate alarm panel</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="highWaterAlarmOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Inlet Baffle Condition</label>
+              <select id="inletBaffle" onchange="toggleOtherField(this, 'inletBaffleOther')">
+                <option value="">-- Select --</option>
+                <option>Good condition</option>
+                <option>Deteriorated</option>
+                <option>Missing</option>
+                <option>Unable to inspect</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="inletBaffleOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Outlet Baffle Condition</label>
+              <select id="outletBaffle" onchange="toggleOtherField(this, 'outletBaffleOther')">
+                <option value="">-- Select --</option>
+                <option>Good condition</option>
+                <option>Deteriorated</option>
+                <option>Missing</option>
+                <option>Unable to inspect</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="outletBaffleOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Inlet Pipe Condition</label>
+              <select id="inletPipe" onchange="toggleOtherField(this, 'inletPipeOther')">
+                <option value="">-- Select --</option>
+                <option>Good condition</option>
+                <option>Sag observed</option>
+                <option>Roots present</option>
+                <option>Crack or break observed</option>
+                <option>Unable to inspect</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="inletPipeOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Outlet Pipe Condition</label>
+              <select id="outletPipe" onchange="toggleOtherField(this, 'outletPipeOther')">
+                <option value="">-- Select --</option>
+                <option>Good condition</option>
+                <option>Sag observed</option>
+                <option>Roots present</option>
+                <option>Crack or break observed</option>
+                <option>Unable to inspect</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="outletPipeOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Effluent Level in Tank</label>
+              <select id="effluentLevel" onchange="toggleOtherField(this, 'effluentLevelOther')">
+                <option value="">-- Select --</option>
+                <option>Normal</option>
+                <option>High</option>
+                <option>Low</option>
+                <option>Tank was full</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="effluentLevelOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Tank Pumped During Inspection</label>
+              <select id="tankPumped" onchange="toggleOtherField(this, 'tankPumpedOther')">
+                <option value="">-- Select --</option>
+                <option>Yes</option>
+                <option>No - seasonal conditions</option>
+                <option>No - recently pumped</option>
+                <option>No - other reason</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="tankPumpedOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Last Pumped (MM/YYYY)</label>
+              <input type="text" id="lastPumped" placeholder="e.g. 06/2020">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Other Tank Notes</label>
+              <div class="textarea-wrapper">
+                <textarea id="tankNotes" placeholder="Any additional notes about the tank..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('tankNotes')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== LEACHFIELD ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Leachfield <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Leachfield Type</label>
+              <select id="leachfieldType" onchange="toggleOtherField(this, 'leachfieldTypeOther')">
+                <option value="">-- Select --</option>
+                <option>Pipe and Stone</option>
+                <option>Infiltrators</option>
+                <option>Enviroseptic Tubes</option>
+                <option>Eljin Indrain</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="leachfieldTypeOther" class="other-input hidden" placeholder="Specify leachfield type...">
+            </div>
+            <div class="form-group">
+              <label>Test Pit Findings</label>
+              <select id="testPitFindings" onchange="toggleOtherField(this, 'testPitFindingsOther')">
+                <option value="">-- Select --</option>
+                <option>No biomat in soil or pooling of effluent</option>
+                <option>Biomat in soil</option>
+                <option>Pooling of effluent</option>
+                <option>Biomat and effluent present in soil</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="testPitFindingsOther" class="other-input hidden" placeholder="Specify findings...">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Vegetation Over Leachfield</label>
+              <select id="vegetation" onchange="toggleOtherField(this, 'vegetationOther')">
+                <option value="">-- Select --</option>
+                <option>Clear and maintained</option>
+                <option>Overgrowth present - maintenance recommended</option>
+                <option>Trees or large shrubs present - removal recommended</option>
+                <option value="Other">Other</option>
+              </select>
+              <input type="text" id="vegetationOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Other Leachfield Notes</label>
+              <div class="textarea-wrapper">
+                <textarea id="leachfieldNotes" placeholder="Additional leachfield observations..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('leachfieldNotes')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HHE-200 DESIGN ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          HHE-200 Design <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="checkbox-row">
+            <input type="checkbox" id="hheProvided" onchange="toggleHHEFields()">
+            <label for="hheProvided">HHE-200 design was provided and reviewed as part of this inspection.</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="hheNotProvided" onchange="toggleHHEFields()">
+            <label for="hheNotProvided">HHE-200 design was not provided.</label>
+          </div>
+          <div class="auto-note hidden" id="hheAutoNote">
+            Without the HHE-200, the inspector cannot verify the system's approved design capacity, component layout, or whether current use falls within the original design parameters.
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== IMAGES (SEPTIC) ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Inspection Photos <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <button class="btn-camera" onclick="takePhoto('septic')">Take Photo</button>
+          <div class="image-drop-zone" id="imageDropZone">
+            <p>Tap to browse photos</p>
+            <p class="hint">or use the camera button above</p>
+            <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="image-gallery" id="imageGallery"></div>
+        </div>
+      </div>
+
+      <!-- ===== RECOMMENDATIONS ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Recommendations <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Inspector Recommendations</label>
+              <div class="textarea-wrapper">
+                <textarea id="recommendations" rows="8" placeholder="Enter your recommendations..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('recommendations')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEPTIC ACTION BUTTONS ===== -->
+      <div class="actions-bar">
+        <button class="btn btn-outline" onclick="previewReport()">Preview Report</button>
+        <button class="btn btn-primary" onclick="generatePdf()">Generate PDF</button>
+        <button class="btn btn-success" onclick="showEmailModal()">Email Report</button>
+        <button class="btn btn-danger" onclick="clearForm()">Clear Form</button>
+      </div>
+
+    </div><!-- end septicTab -->
+
+    <!-- =================== SEWER TAB ============================== -->
+    <div id="sewerTab" style="display:none;">
+
+      <!-- ===== SEWER HEADER INFO ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Header Info <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="sewerCustomerName" placeholder="John & Jane Doe">
+            </div>
+            <div class="form-group">
+              <label>Inspector</label>
+              <input type="text" id="sewerInspectorName" value="Tyler Fish" readonly style="background:#eee;color:#555;">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Job Site Address</label>
+              <input type="text" id="sewerJobAddress" placeholder="9 Harden Ave, Camden, ME">
+            </div>
+            <div class="form-group">
+              <label>Date Completed</label>
+              <input type="date" id="sewerDate">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIDEO LINK ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Video Link <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Google Drive Video Link</label>
+              <input type="text" id="sewerVideoLink" placeholder="https://drive.google.com/file/d/...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUMMARY OF FINDINGS ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Summary of Findings <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Summary of Findings</label>
+              <div class="textarea-wrapper">
+                <textarea id="sewerFindings" rows="12" placeholder="Describe camera inspection findings, pipe material, distances, conditions observed..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('sewerFindings')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEWER IMAGES ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Inspection Photos <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <button class="btn-camera" onclick="takePhoto('sewer')">Take Photo</button>
+          <div class="image-drop-zone" id="sewerImageDropZone">
+            <p>Tap to browse photos</p>
+            <p class="hint">or use the camera button above</p>
+            <input type="file" id="sewerImageFileInput" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="image-gallery" id="sewerImageGallery"></div>
+        </div>
+      </div>
+
+      <!-- ===== SEWER ACTION BUTTONS ===== -->
+      <div class="actions-bar">
+        <button class="btn btn-outline" onclick="previewReport()">Preview Report</button>
+        <button class="btn btn-primary" onclick="generatePdf()">Generate PDF</button>
+        <button class="btn btn-success" onclick="showEmailModal()">Email Report</button>
+        <button class="btn btn-danger" onclick="clearSewerForm()">Clear Form</button>
+      </div>
+
+    </div><!-- end sewerTab -->
+
+  </div>
+
+  <!-- ===== SETTINGS MODAL ===== -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <h2>Settings</h2>
+      <div class="form-group">
+        <label>Claude API Key</label>
+        <input type="password" id="settingsApiKey" placeholder="sk-ant-...">
+      </div>
+      <p style="font-size: 12px; color: var(--text-light); margin-top: 8px;">Email uses your phone's share feature — no SMTP setup needed.</p>
+      <!-- Hidden SMTP fields (renderer.js reads these, we provide dummy values via api-mobile.js) -->
+      <input type="hidden" id="settingsSmtpHost" value="mobile-share">
+      <input type="hidden" id="settingsSmtpPort" value="587">
+      <input type="hidden" id="settingsSmtpUser" value="mobile-share">
+      <input type="hidden" id="settingsSmtpPass" value="mobile-share">
+      <input type="hidden" id="settingsGoogleDriveFolder" value="">
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('settingsModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EMAIL MODAL ===== -->
+  <div class="modal-overlay" id="emailModal">
+    <div class="modal">
+      <h2>Share Report</h2>
+      <div class="form-group" style="display:none;">
+        <label>To</label>
+        <input type="text" id="emailTo" value="share">
+      </div>
+      <div class="form-group" style="display:none;">
+        <label>CC</label>
+        <input type="text" id="emailCc">
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="emailSubject">
+      </div>
+      <div class="form-group">
+        <label>Body</label>
+        <textarea id="emailBody" rows="4"></textarea>
+      </div>
+      <p style="font-size: 12px; color: var(--text-light); margin-top: 8px;">PDF will be shared via your phone's share menu. Pick your email app to send.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('emailModal')">Cancel</button>
+        <button class="btn btn-success" onclick="sendEmail()">Share Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DRAFTS MODAL ===== -->
+  <div class="modal-overlay" id="draftsModal">
+    <div class="modal">
+      <h2>Saved Drafts</h2>
+      <ul class="drafts-list" id="draftsList">
+        <li style="color: var(--text-light); justify-content: center;">Loading...</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('draftsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW MODAL ===== -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal" style="width: 800px; max-width: 95%;">
+      <h2>Report Preview</h2>
+      <div id="previewContent" style="max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); padding: 20px; border-radius: 4px; background: white;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('previewModal')">Close</button>
+        <button class="btn btn-primary" onclick="closeModal('previewModal'); generatePdf();">Generate PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="api-mobile.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

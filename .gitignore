@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.exe
+.env
+website-server.js
+saved-reports/
+settings.json
+.claude/
+PLAN.md

@@ -1,0 +1,26 @@
+{
+  "name": "iss-inspection-mobile",
+  "version": "1.0.0",
+  "description": "Interstate Septic Systems - Inspection App (Mobile)",
+  "private": true,
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.0",
+    "@capacitor/network": "^6.0.0",
+    "@capacitor/preferences": "^6.0.0",
+    "@capacitor/share": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "html2pdf.js": "^0.14.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

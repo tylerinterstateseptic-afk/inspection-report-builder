@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspection Report Builder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-brand">
+      <h1 id="topBarCompanyName">Inspection Report Builder</h1>
+      <span class="top-bar-tagline">Inspection Report Builder</span>
+    </div>
+    <div class="top-bar-actions">
+      <button onclick="showDraftsModal()">Load Draft</button>
+      <button onclick="saveDraft()">Save Draft</button>
+      <button onclick="showSettingsModal()">Settings</button>
+      <button id="editModeBtn" class="btn-edit-mode" onclick="toggleEditMode()">Edit Fields</button>
+    </div>
+  </div>
+
+  <!-- Tab Buttons -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabBtnSeptic" onclick="switchTab('septic')">Septic Inspection</button>
+    <button class="tab-btn" id="tabBtnSewer" onclick="switchTab('sewer')">Sewer Camera Inspection</button>
+  </div>
+
+  <div class="main-container">
+
+    <!-- ============================================================ -->
+    <!-- =================== SEPTIC TAB ============================= -->
+    <!-- ============================================================ -->
+    <div id="septicTab">
+
+      <!-- ===== HEADER INFO ===== -->
+      <div class="section" data-section-id="headerInfo">
+        <div class="section-header" onclick="toggleSection(this)">
+          Header Info <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="customerName" placeholder="John & Jane Doe">
+            </div>
+            <div class="form-group">
+              <label>Inspector</label>
+              <input type="text" id="inspectorName" placeholder="Inspector Name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Job Site Address</label>
+              <input type="text" id="jobAddress" placeholder="123 Main St, Town, State">
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="inspectionDate">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEPTIC TANK ===== -->
+      <div class="section" data-section-id="septicTank">
+        <div class="section-header" onclick="toggleSection(this)">
+          Septic Tank <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tank Type</label>
+              <select id="tankType" onchange="toggleOtherField(this, 'tankTypeOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="tankTypeOther" class="other-input hidden" placeholder="Specify tank type...">
+            </div>
+            <div class="form-group">
+              <label>Tank Capacity</label>
+              <select id="tankCapacity" onchange="toggleOtherField(this, 'tankCapacityOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="tankCapacityOther" class="other-input hidden" placeholder="Specify capacity...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pump Station</label>
+              <select id="pumpStation" onchange="togglePumpFields()">
+                <option value="">-- Select --</option>
+              </select>
+            </div>
+            <div class="form-group hidden" id="pumpConditionGroup">
+              <label>Pump Condition</label>
+              <select id="pumpCondition" onchange="toggleOtherField(this, 'pumpConditionOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="pumpConditionOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row single hidden" id="highWaterAlarmGroup">
+            <div class="form-group">
+              <label>High Water Alarm</label>
+              <select id="highWaterAlarm" onchange="toggleOtherField(this, 'highWaterAlarmOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="highWaterAlarmOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Inlet Baffle Condition</label>
+              <select id="inletBaffle" onchange="toggleOtherField(this, 'inletBaffleOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="inletBaffleOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Outlet Baffle Condition</label>
+              <select id="outletBaffle" onchange="toggleOtherField(this, 'outletBaffleOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="outletBaffleOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Inlet Pipe Condition</label>
+              <select id="inletPipe" onchange="toggleOtherField(this, 'inletPipeOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="inletPipeOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Outlet Pipe Condition</label>
+              <select id="outletPipe" onchange="toggleOtherField(this, 'outletPipeOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="outletPipeOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Effluent Level in Tank</label>
+              <select id="effluentLevel" onchange="toggleOtherField(this, 'effluentLevelOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="effluentLevelOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+            <div class="form-group">
+              <label>Tank Pumped During Inspection</label>
+              <select id="tankPumped" onchange="toggleOtherField(this, 'tankPumpedOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="tankPumpedOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Last Pumped (MM/YYYY)</label>
+              <input type="text" id="lastPumped" placeholder="e.g. 06/2020">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Other Tank Notes</label>
+              <div class="textarea-wrapper">
+                <textarea id="tankNotes" placeholder="Any additional notes about the tank..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('tankNotes')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== LEACHFIELD ===== -->
+      <div class="section" data-section-id="leachfield">
+        <div class="section-header" onclick="toggleSection(this)">
+          Leachfield <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Leachfield Type</label>
+              <select id="leachfieldType" onchange="toggleOtherField(this, 'leachfieldTypeOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="leachfieldTypeOther" class="other-input hidden" placeholder="Specify leachfield type...">
+            </div>
+            <div class="form-group">
+              <label>Test Pit Findings</label>
+              <select id="testPitFindings" onchange="toggleOtherField(this, 'testPitFindingsOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="testPitFindingsOther" class="other-input hidden" placeholder="Specify findings...">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Vegetation Over Leachfield</label>
+              <select id="vegetation" onchange="toggleOtherField(this, 'vegetationOther')">
+                <option value="">-- Select --</option>
+              </select>
+              <input type="text" id="vegetationOther" class="other-input hidden" placeholder="Specify...">
+            </div>
+          </div>
+
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Other Leachfield Notes</label>
+              <div class="textarea-wrapper">
+                <textarea id="leachfieldNotes" placeholder="Additional leachfield observations..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('leachfieldNotes')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HHE-200 DESIGN ===== -->
+      <div class="section" data-section-id="hheDesign">
+        <div class="section-header" onclick="toggleSection(this)">
+          HHE-200 Design <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="checkbox-row">
+            <input type="checkbox" id="hheProvided" onchange="toggleHHEFields()">
+            <label for="hheProvided">HHE-200 design was provided and reviewed as part of this inspection.</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="hheNotProvided" onchange="toggleHHEFields()">
+            <label for="hheNotProvided">HHE-200 design was not provided.</label>
+          </div>
+          <div class="auto-note hidden" id="hheAutoNote">
+            Without the HHE-200, the inspector cannot verify the system's approved design capacity, component layout, or whether current use falls within the original design parameters.
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== IMAGES (SEPTIC) ===== -->
+      <div class="section" data-section-id="photos">
+        <div class="section-header" onclick="toggleSection(this)">
+          Inspection Photos <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="image-drop-zone" id="imageDropZone">
+            <p>Drag & drop images here</p>
+            <p class="hint">or click to browse &bull; Ctrl+V to paste from clipboard</p>
+            <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="image-gallery" id="imageGallery"></div>
+        </div>
+      </div>
+
+      <!-- ===== RECOMMENDATIONS ===== -->
+      <div class="section" data-section-id="recommendations">
+        <div class="section-header" onclick="toggleSection(this)">
+          Recommendations <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Inspector Recommendations</label>
+              <div class="textarea-wrapper">
+                <textarea id="recommendations" rows="8" placeholder="Enter your recommendations..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('recommendations')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEPTIC ACTION BUTTONS ===== -->
+      <div class="actions-bar">
+        <button class="btn btn-outline" onclick="previewReport()">Preview Report</button>
+        <button class="btn btn-primary" onclick="generatePdf()">Generate PDF</button>
+        <button class="btn btn-success" onclick="showEmailModal()">Email Report</button>
+        <button class="btn btn-danger" onclick="clearForm()">Clear Form</button>
+      </div>
+
+    </div><!-- end septicTab -->
+
+    <!-- ============================================================ -->
+    <!-- =================== SEWER TAB ============================== -->
+    <!-- ============================================================ -->
+    <div id="sewerTab" style="display:none;">
+
+      <!-- ===== SEWER HEADER INFO ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Header Info <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Customer Name</label>
+              <input type="text" id="sewerCustomerName" placeholder="John & Jane Doe">
+            </div>
+            <div class="form-group">
+              <label>Inspector</label>
+              <input type="text" id="sewerInspectorName" placeholder="Inspector Name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Job Site Address</label>
+              <input type="text" id="sewerJobAddress" placeholder="9 Harden Ave, Camden, ME">
+            </div>
+            <div class="form-group">
+              <label>Date Completed</label>
+              <input type="date" id="sewerDate">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== VIDEO LINK ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Video Link <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Google Drive Video Link</label>
+              <input type="text" id="sewerVideoLink" placeholder="https://drive.google.com/file/d/...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUMMARY OF FINDINGS ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Summary of Findings <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Summary of Findings</label>
+              <div class="textarea-wrapper">
+                <textarea id="sewerFindings" rows="12" placeholder="Describe camera inspection findings, pipe material, distances, conditions observed..."></textarea>
+                <button class="btn-ai" onclick="improveWriting('sewerFindings')" title="Improve with AI">AI Improve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEWER IMAGES ===== -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          Inspection Photos <span class="chevron">&#9660;</span>
+        </div>
+        <div class="section-body">
+          <div class="image-drop-zone" id="sewerImageDropZone">
+            <p>Drag & drop images here</p>
+            <p class="hint">or click to browse &bull; Ctrl+V to paste from clipboard</p>
+            <input type="file" id="sewerImageFileInput" accept="image/*" multiple style="display:none">
+          </div>
+          <div class="image-gallery" id="sewerImageGallery"></div>
+        </div>
+      </div>
+
+      <!-- ===== SEWER ACTION BUTTONS ===== -->
+      <div class="actions-bar">
+        <button class="btn btn-outline" onclick="previewReport()">Preview Report</button>
+        <button class="btn btn-primary" onclick="generatePdf()">Generate PDF</button>
+        <button class="btn btn-success" onclick="showEmailModal()">Email Report</button>
+        <button class="btn btn-danger" onclick="clearSewerForm()">Clear Form</button>
+      </div>
+
+    </div><!-- end sewerTab -->
+
+  </div>
+
+  <!-- ===== SETTINGS MODAL ===== -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal" style="width:600px;max-width:95%;max-height:85vh;overflow-y:auto;">
+      <h2>Settings</h2>
+
+      <h3 style="margin: 4px 0 8px; font-size: 15px; color: var(--primary);">Company Branding</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Company Name</label>
+          <input type="text" id="settingsCompanyName" placeholder="Your Company Name">
+        </div>
+        <div class="form-group">
+          <label>Inspector Name</label>
+          <input type="text" id="settingsInspectorName" placeholder="Your Name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Company Address</label>
+        <input type="text" id="settingsCompanyAddress" placeholder="123 Main St, City, ST 00000">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Company Phone</label>
+          <input type="text" id="settingsCompanyPhone" placeholder="555-555-5555">
+        </div>
+        <div class="form-group">
+          <label>Established</label>
+          <input type="text" id="settingsCompanyEst" placeholder="Est. 2020">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Company Tagline</label>
+        <input type="text" id="settingsCompanyTagline" placeholder="Your tagline here">
+      </div>
+
+      <h3 style="margin: 16px 0 8px; font-size: 15px; color: var(--primary);">Fonts</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Report Body Font</label>
+          <select id="settingsReportFont">
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Arial">Arial</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Garamond">Garamond</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Company Name Font</label>
+          <select id="settingsCompanyNameFont">
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Palatino">Palatino</option>
+            <option value="Garamond">Garamond</option>
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Arial">Arial</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 style="margin: 16px 0 8px; font-size: 15px; color: var(--primary);">AI Integration</h3>
+      <div class="form-group">
+        <label>Claude API Key</label>
+        <input type="password" id="settingsApiKey" placeholder="sk-ant-...">
+      </div>
+
+      <h3 style="margin: 16px 0 8px; font-size: 15px; color: var(--primary);">Email Configuration (SMTP)</h3>
+      <div class="form-group">
+        <label>SMTP Host</label>
+        <input type="text" id="settingsSmtpHost" placeholder="smtp.gmail.com">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>SMTP Port</label>
+          <input type="text" id="settingsSmtpPort" placeholder="587">
+        </div>
+        <div class="form-group">
+          <label>Email / Username</label>
+          <input type="text" id="settingsSmtpUser" placeholder="you@gmail.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password / App Password</label>
+        <input type="password" id="settingsSmtpPass" placeholder="App password">
+      </div>
+
+      <h3 style="margin: 16px 0 8px; font-size: 15px; color: var(--primary);">Google Drive</h3>
+      <div class="form-group">
+        <label>Google Drive Folder Path</label>
+        <input type="text" id="settingsGoogleDriveFolder" placeholder="G:\My Drive\Inspection Reports">
+        <p style="font-size:11px;color:var(--text-light);margin-top:4px;">PDFs will be auto-copied here after generation. Leave blank to disable.</p>
+      </div>
+
+      <h3 style="margin: 16px 0 8px; font-size: 15px; color: var(--primary);">Report Disclaimers</h3>
+      <p style="font-size:11px;color:var(--text-light);margin-bottom:8px;">Customize the disclaimer text that appears at the bottom of each report type. Use <strong>{companyName}</strong> as a placeholder for your company name.</p>
+      <div class="form-group">
+        <label>Septic Inspection Disclaimer</label>
+        <textarea id="settingsSepticDisclaimer" rows="8" style="font-size:12px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Sewer Camera Inspection Disclaimer</label>
+        <textarea id="settingsSewerDisclaimer" rows="8" style="font-size:12px;"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('settingsModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EMAIL MODAL ===== -->
+  <div class="modal-overlay" id="emailModal">
+    <div class="modal">
+      <h2>Send Report via Email</h2>
+      <div class="form-group">
+        <label>To</label>
+        <input type="text" id="emailTo" placeholder="recipient@email.com">
+      </div>
+      <div class="form-group">
+        <label>CC (optional)</label>
+        <input type="text" id="emailCc" placeholder="cc@email.com">
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="emailSubject">
+      </div>
+      <div class="form-group">
+        <label>Body</label>
+        <textarea id="emailBody" rows="4"></textarea>
+      </div>
+      <p style="font-size: 12px; color: var(--text-light); margin-top: 8px;">PDF report will be attached automatically.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('emailModal')">Cancel</button>
+        <button class="btn btn-success" onclick="sendEmail()">Send Email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DRAFTS MODAL ===== -->
+  <div class="modal-overlay" id="draftsModal">
+    <div class="modal">
+      <h2>Saved Drafts</h2>
+      <ul class="drafts-list" id="draftsList">
+        <li style="color: var(--text-light); justify-content: center;">Loading...</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('draftsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PREVIEW MODAL ===== -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal" style="width: 800px; max-width: 95%;">
+      <h2>Report Preview</h2>
+      <div id="previewContent" style="max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); padding: 20px; border-radius: 4px; background: white;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('previewModal')">Close</button>
+        <button class="btn btn-primary" onclick="closeModal('previewModal'); generatePdf();">Generate PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADD FIELD MODAL ===== -->
+  <div class="modal-overlay" id="addFieldModal">
+    <div class="modal" style="width:440px;">
+      <h2>Add New Field</h2>
+      <div class="form-group">
+        <label>Field Name</label>
+        <input type="text" id="addFieldName" placeholder="e.g. Distribution Box Condition">
+      </div>
+      <div class="form-group">
+        <label>Dropdown Options (comma separated)</label>
+        <input type="text" id="addFieldOptions" placeholder="e.g. Good, Fair, Poor">
+      </div>
+      <input type="hidden" id="addFieldSectionId">
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('addFieldModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAddField()">Add Field</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADD SECTION MODAL ===== -->
+  <div class="modal-overlay" id="addSectionModal">
+    <div class="modal" style="width:440px;">
+      <h2>Add New Section</h2>
+      <div class="form-group">
+        <label>Section Name</label>
+        <input type="text" id="addSectionName" placeholder="e.g. Distribution Box">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('addSectionModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmAddSection()">Add Section</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIRM MODAL ===== -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal" style="width:400px;">
+      <h2 id="confirmModalTitle">Confirm</h2>
+      <p id="confirmModalMessage" style="margin:12px 0 20px;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" id="confirmModalOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DROPDOWN EDITOR MODAL ===== -->
+  <div class="modal-overlay" id="dropdownEditorModal">
+    <div class="modal" style="width:440px;">
+      <h2 id="dropdownEditorTitle">Edit Options</h2>
+      <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">"-- Select --" and "Other" are added automatically.</p>
+      <ul class="option-list" id="optionList"></ul>
+      <div class="add-option-row">
+        <input type="text" id="newOptionInput" placeholder="Add new option..." onkeydown="if(event.key==='Enter')addOption()">
+        <button class="btn btn-success" onclick="addOption()" style="padding:8px 14px;">Add</button>
+      </div>
+      <div class="modal-actions" style="justify-content:space-between;">
+        <button class="btn btn-danger" onclick="resetDropdownToDefault()" style="font-size:12px;padding:6px 12px;">Reset to Default</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline" onclick="closeModal('dropdownEditorModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveDropdownEdits()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
