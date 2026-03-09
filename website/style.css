@@ -606,6 +606,108 @@ code {
   color: var(--text-muted);
 }
 
+/* License purchase card */
+.license-card {
+  border: 2px solid var(--accent-green);
+}
+
+.license-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.license-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.license-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  background: var(--accent-green);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ===== HOW IT WORKS ===== */
+.how-it-works {
+  padding: 100px 0;
+  background: var(--bg-card);
+}
+
+.steps-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.timeline-step {
+  text-align: center;
+  position: relative;
+}
+
+.timeline-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--accent-green);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.timeline-content h3 {
+  color: var(--text-primary);
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.timeline-content p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .steps-timeline {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .timeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    text-align: left;
+  }
+  .timeline-number {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+}
+
 /* ===== DISCLAIMER ===== */
 .disclaimer {
   padding: 100px 0;
