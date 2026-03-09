@@ -60,6 +60,167 @@
     </div>
   </div>
 
+  <!-- Setup Wizard Overlay -->
+  <div class="setup-wizard-overlay" id="setupWizard" style="display:none;">
+    <div class="setup-wizard-card">
+
+      <!-- Progress Dots -->
+      <div class="setup-wizard-progress">
+        <span class="sw-dot active" data-step="0"></span>
+        <span class="sw-dot" data-step="1"></span>
+        <span class="sw-dot" data-step="2"></span>
+        <span class="sw-dot" data-step="3"></span>
+        <span class="sw-dot" data-step="4"></span>
+      </div>
+
+      <!-- Step 0: Welcome -->
+      <div class="setup-wizard-step active" data-step="0">
+        <div style="font-size:48px;margin-bottom:8px;">&#9881;</div>
+        <h2>Welcome to Inspection Report Builder</h2>
+        <p class="sw-subtitle">Let's get you set up in a few minutes. You can skip any step and come back later from the top bar.</p>
+        <div class="sw-feature-cards">
+          <div class="sw-feature-card">
+            <div class="sw-feature-icon">&#9993;</div>
+            <div class="sw-feature-label">Email Delivery</div>
+            <div class="sw-feature-desc">Send reports directly to clients</div>
+          </div>
+          <div class="sw-feature-card">
+            <div class="sw-feature-icon">&#9729;</div>
+            <div class="sw-feature-label">Google Drive</div>
+            <div class="sw-feature-desc">Auto-backup PDFs to the cloud</div>
+          </div>
+          <div class="sw-feature-card">
+            <div class="sw-feature-icon">&#129302;</div>
+            <div class="sw-feature-label">AI Writing</div>
+            <div class="sw-feature-desc">Polish field notes with one click</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Email Setup -->
+      <div class="setup-wizard-step" data-step="1">
+        <h2>&#9993; Email Setup</h2>
+        <p class="sw-subtitle">Connect your email to send reports directly to clients with the PDF attached.</p>
+
+        <div class="sw-preset-row">
+          <button class="sw-preset-btn" onclick="applyGmailPreset()">Use Gmail</button>
+          <button class="sw-preset-btn" onclick="applyOutlookPreset()">Use Outlook</button>
+          <button class="sw-preset-btn" onclick="applyYahooPreset()">Use Yahoo</button>
+        </div>
+
+        <div class="sw-form-grid">
+          <div class="form-group">
+            <label>SMTP Host</label>
+            <input type="text" id="swSmtpHost" placeholder="smtp.gmail.com">
+          </div>
+          <div class="form-group">
+            <label>SMTP Port</label>
+            <input type="text" id="swSmtpPort" placeholder="587">
+          </div>
+          <div class="form-group sw-full-width">
+            <label>Email Address / Username</label>
+            <input type="email" id="swSmtpUser" placeholder="your-email@gmail.com">
+          </div>
+          <div class="form-group sw-full-width">
+            <label>App Password</label>
+            <input type="password" id="swSmtpPass" placeholder="Paste your 16-character app password">
+          </div>
+        </div>
+
+        <div class="sw-instructions">
+          <h4>How to get a Gmail App Password:</h4>
+          <ol>
+            <li>Go to <strong>myaccount.google.com</strong> &rarr; Security &rarr; enable <strong>2-Step Verification</strong></li>
+            <li>Then go to <strong>myaccount.google.com/apppasswords</strong></li>
+            <li>Name it "Inspection Report Builder" and click <strong>Generate</strong></li>
+            <li>Copy the 16-character password and paste it above</li>
+          </ol>
+          <p class="sw-note">For Outlook use <code>smtp.office365.com</code> port <code>587</code>. For Yahoo use <code>smtp.mail.yahoo.com</code> port <code>465</code>.</p>
+        </div>
+      </div>
+
+      <!-- Step 2: Google Drive -->
+      <div class="setup-wizard-step" data-step="2">
+        <h2>&#9729; Google Drive Setup</h2>
+        <p class="sw-subtitle">Auto-copy every generated PDF to a Google Drive folder for cloud backup.</p>
+
+        <div class="form-group" style="margin-top:20px;">
+          <label>Google Drive Folder Path</label>
+          <input type="text" id="swGoogleDrive" placeholder="G:\My Drive\Inspection Reports">
+        </div>
+
+        <div class="sw-instructions">
+          <h4>Setup steps:</h4>
+          <ol>
+            <li>Download and install <strong>Google Drive for Desktop</strong> from Google</li>
+            <li>It creates a synced folder &mdash; usually <code>G:\My Drive</code> on Windows or <code>/Volumes/GoogleDrive/My Drive</code> on Mac</li>
+            <li>Optionally create a subfolder like <code>G:\My Drive\Inspection Reports</code></li>
+            <li>Paste the full path above</li>
+          </ol>
+          <p class="sw-note">Every PDF you generate will be automatically copied to this folder and synced to the cloud. If you don't use Google Drive, skip this step.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: AI Writing Assistant -->
+      <div class="setup-wizard-step" data-step="3">
+        <h2>&#129302; AI Writing Assistant</h2>
+        <p class="sw-subtitle">Connect Claude AI to turn rough field notes into polished, professional language with one click.</p>
+
+        <div class="form-group" style="margin-top:20px;">
+          <label>Claude API Key</label>
+          <input type="password" id="swApiKey" placeholder="sk-ant-api03-...">
+        </div>
+
+        <div class="sw-instructions">
+          <h4>How to get your API key:</h4>
+          <ol>
+            <li>Go to <strong>console.anthropic.com</strong> and create an account</li>
+            <li>Add a payment method (pay-per-use, just cents per report)</li>
+            <li>Go to <strong>API Keys</strong> &rarr; click <strong>Create Key</strong></li>
+            <li>Copy the key (starts with <code>sk-ant-...</code>) and paste it above</li>
+          </ol>
+          <p class="sw-note"><strong>Cost:</strong> Each text improvement costs roughly $0.01&ndash;0.03. A typical month of heavy use is about $5&ndash;10. Your key is stored locally on your computer and never shared with anyone.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: All Done -->
+      <div class="setup-wizard-step" data-step="4">
+        <div style="font-size:48px;margin-bottom:8px;">&#9989;</div>
+        <h2>You're All Set!</h2>
+        <p class="sw-subtitle">Here's a summary of your setup. You can change any of these anytime in <strong>Settings</strong>.</p>
+
+        <div class="sw-summary">
+          <div class="sw-summary-item" id="swSummaryEmail">
+            <span class="sw-summary-icon">&#9993;</span>
+            <span class="sw-summary-label">Email Delivery</span>
+            <span class="sw-summary-status" id="swSummaryEmailStatus">Not configured</span>
+          </div>
+          <div class="sw-summary-item" id="swSummaryDrive">
+            <span class="sw-summary-icon">&#9729;</span>
+            <span class="sw-summary-label">Google Drive</span>
+            <span class="sw-summary-status" id="swSummaryDriveStatus">Not configured</span>
+          </div>
+          <div class="sw-summary-item" id="swSummaryAI">
+            <span class="sw-summary-icon">&#129302;</span>
+            <span class="sw-summary-label">AI Writing</span>
+            <span class="sw-summary-status" id="swSummaryAIStatus">Not configured</span>
+          </div>
+        </div>
+
+        <p class="sw-note" style="margin-top:16px;">Skipped a step? No problem &mdash; click <strong>Setup Guide</strong> in the top bar anytime to come back.</p>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="setup-wizard-nav">
+        <button class="btn btn-outline sw-btn-back" id="swBtnBack" onclick="setupWizardBack()" style="display:none;">Back</button>
+        <div class="sw-nav-spacer"></div>
+        <button class="btn btn-outline sw-btn-skip" id="swBtnSkip" onclick="setupWizardSkip()">Skip</button>
+        <button class="btn btn-primary sw-btn-next" id="swBtnNext" onclick="setupWizardNext()">Get Started</button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="top-bar-brand">
@@ -69,6 +230,7 @@
     <div class="top-bar-actions">
       <button onclick="showDraftsModal()">Load Draft</button>
       <button onclick="saveDraft()">Save Draft</button>
+      <button onclick="showSetupWizard()" class="btn-setup-guide">Setup Guide</button>
       <button onclick="showSettingsModal()">Settings</button>
       <button id="editModeBtn" class="btn-edit-mode" onclick="toggleEditMode()">Edit Fields</button>
     </div>

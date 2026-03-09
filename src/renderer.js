@@ -1123,6 +1123,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sewerDate').value = new Date().toISOString().split('T')[0];
   setupImageHandling();
   setupSewerImageHandling();
+
+  // Show setup wizard on first launch
+  if (!settings.setupWizardCompleted) {
+    showSetupWizard();
+  }
 });
 
 function applyBrandingSettings() {
@@ -2239,4 +2244,176 @@ function showLicenseModal() {
   document.getElementById('licenseModalError').style.display = 'none';
   document.getElementById('licenseModalSuccess').style.display = 'none';
   showModal('licenseModal');
+}
+
+// ============================
+// SETUP WIZARD
+// ============================
+let setupWizardCurrentStep = 0;
+const SETUP_WIZARD_TOTAL_STEPS = 5; // 0=welcome, 1=email, 2=drive, 3=ai, 4=done
+
+function showSetupWizard() {
+  setupWizardCurrentStep = 0;
+
+  // Pre-fill fields from existing settings
+  document.getElementById('swSmtpHost').value = settings.smtpHost || '';
+  document.getElementById('swSmtpPort').value = settings.smtpPort || '';
+  document.getElementById('swSmtpUser').value = settings.smtpUser || '';
+  document.getElementById('swSmtpPass').value = settings.smtpPass || '';
+  document.getElementById('swGoogleDrive').value = settings.googleDriveFolder || '';
+  document.getElementById('swApiKey').value = settings.apiKey || '';
+
+  setupWizardGoToStep(0);
+  document.getElementById('setupWizard').style.display = 'flex';
+}
+
+function closeSetupWizard() {
+  document.getElementById('setupWizard').style.display = 'none';
+}
+
+function setupWizardGoToStep(stepIndex) {
+  setupWizardCurrentStep = stepIndex;
+
+  // Show/hide steps
+  document.querySelectorAll('.setup-wizard-step').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.step) === stepIndex);
+  });
+
+  // Update progress dots
+  document.querySelectorAll('.sw-dot').forEach(dot => {
+    const dotStep = parseInt(dot.dataset.step);
+    dot.classList.remove('active', 'completed');
+    if (dotStep === stepIndex) {
+      dot.classList.add('active');
+    } else if (dotStep < stepIndex) {
+      dot.classList.add('completed');
+    }
+  });
+
+  // Update navigation buttons
+  const btnBack = document.getElementById('swBtnBack');
+  const btnSkip = document.getElementById('swBtnSkip');
+  const btnNext = document.getElementById('swBtnNext');
+
+  // Back button — hidden on welcome and done steps
+  btnBack.style.display = (stepIndex > 0 && stepIndex < 4) ? 'inline-block' : 'none';
+
+  // Skip button — only on steps 1-3
+  btnSkip.style.display = (stepIndex >= 1 && stepIndex <= 3) ? 'inline-block' : 'none';
+
+  // Next button text
+  if (stepIndex === 0) {
+    btnNext.textContent = 'Get Started';
+  } else if (stepIndex === 3) {
+    btnNext.textContent = 'Finish Setup';
+  } else if (stepIndex === 4) {
+    btnNext.textContent = 'Start Building Reports';
+  } else {
+    btnNext.textContent = 'Next';
+  }
+}
+
+function setupWizardNext() {
+  // Save current step data before advancing
+  setupWizardSaveCurrentStep();
+
+  if (setupWizardCurrentStep >= 4) {
+    // Final step — complete the wizard
+    setupWizardComplete();
+    return;
+  }
+
+  // If on step 3 (AI), go to summary and build it
+  if (setupWizardCurrentStep === 3) {
+    setupWizardBuildSummary();
+  }
+
+  setupWizardGoToStep(setupWizardCurrentStep + 1);
+}
+
+function setupWizardBack() {
+  if (setupWizardCurrentStep > 0) {
+    setupWizardGoToStep(setupWizardCurrentStep - 1);
+  }
+}
+
+function setupWizardSkip() {
+  // Don't save current step — just advance
+  if (setupWizardCurrentStep === 3) {
+    setupWizardBuildSummary();
+  }
+  if (setupWizardCurrentStep < 4) {
+    setupWizardGoToStep(setupWizardCurrentStep + 1);
+  }
+}
+
+function setupWizardSaveCurrentStep() {
+  // Gather values from current step into settings
+  if (setupWizardCurrentStep === 1) {
+    const host = document.getElementById('swSmtpHost').value.trim();
+    const port = document.getElementById('swSmtpPort').value.trim();
+    const user = document.getElementById('swSmtpUser').value.trim();
+    const pass = document.getElementById('swSmtpPass').value;
+    if (host) settings.smtpHost = host;
+    if (port) settings.smtpPort = port;
+    if (user) settings.smtpUser = user;
+    if (pass) settings.smtpPass = pass;
+  } else if (setupWizardCurrentStep === 2) {
+    const folder = document.getElementById('swGoogleDrive').value.trim();
+    if (folder) settings.googleDriveFolder = folder;
+  } else if (setupWizardCurrentStep === 3) {
+    const key = document.getElementById('swApiKey').value.trim();
+    if (key) settings.apiKey = key;
+  }
+}
+
+function setupWizardBuildSummary() {
+  // Save step 3 data first (in case coming from step 3)
+  setupWizardSaveCurrentStep();
+
+  // Email status
+  const emailConfigured = settings.smtpHost && settings.smtpUser && settings.smtpPass;
+  const emailStatus = document.getElementById('swSummaryEmailStatus');
+  emailStatus.textContent = emailConfigured ? 'Configured' : 'Not configured';
+  emailStatus.className = 'sw-summary-status ' + (emailConfigured ? 'configured' : 'skipped');
+
+  // Google Drive status
+  const driveConfigured = !!settings.googleDriveFolder;
+  const driveStatus = document.getElementById('swSummaryDriveStatus');
+  driveStatus.textContent = driveConfigured ? 'Configured' : 'Not configured';
+  driveStatus.className = 'sw-summary-status ' + (driveConfigured ? 'configured' : 'skipped');
+
+  // AI status
+  const aiConfigured = !!settings.apiKey;
+  const aiStatus = document.getElementById('swSummaryAIStatus');
+  aiStatus.textContent = aiConfigured ? 'Configured' : 'Not configured';
+  aiStatus.className = 'sw-summary-status ' + (aiConfigured ? 'configured' : 'skipped');
+}
+
+async function setupWizardComplete() {
+  settings.setupWizardCompleted = true;
+  try {
+    await window.api.saveSettings(settings);
+    applyBrandingSettings();
+    showToast('Setup complete!', 'success');
+  } catch (e) {
+    console.error('Failed to save settings from wizard:', e);
+  }
+  closeSetupWizard();
+}
+
+// Email preset helpers
+function applyGmailPreset() {
+  document.getElementById('swSmtpHost').value = 'smtp.gmail.com';
+  document.getElementById('swSmtpPort').value = '587';
+}
+
+function applyOutlookPreset() {
+  document.getElementById('swSmtpHost').value = 'smtp.office365.com';
+  document.getElementById('swSmtpPort').value = '587';
+}
+
+function applyYahooPreset() {
+  document.getElementById('swSmtpHost').value = 'smtp.mail.yahoo.com';
+  document.getElementById('swSmtpPort').value = '465';
 }
