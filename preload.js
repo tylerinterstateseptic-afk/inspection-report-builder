@@ -17,4 +17,8 @@ contextBridge.exposeInMainWorld('api', {
   copyToGoogleDrive: (sourcePath, fileName) => ipcRenderer.invoke('copy-to-google-drive', { sourcePath, fileName }),
   saveFieldConfig: (config) => ipcRenderer.invoke('save-field-config', config),
   loadFieldConfig: () => ipcRenderer.invoke('load-field-config'),
+  // License system
+  getLicenseStatus: () => ipcRenderer.invoke('get-license-status'),
+  activateLicense: (licenseKey) => ipcRenderer.invoke('activate-license', licenseKey),
+  validateLicense: () => ipcRenderer.invoke('validate-license'),
 });

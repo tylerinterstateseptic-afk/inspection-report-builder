@@ -8,6 +8,58 @@
 </head>
 <body>
 
+  <!-- License Gate (blocks app when trial expired and no license) -->
+  <div class="license-gate" id="licenseGate" style="display:none;">
+    <div class="license-gate-card">
+      <div style="font-size:48px;margin-bottom:12px;">&#128274;</div>
+      <h2>Trial Expired</h2>
+      <p>Your 7-day free trial has ended. Enter a license key to continue using Inspection Report Builder.</p>
+      <div class="form-group" style="margin-top:20px;">
+        <label>License Key</label>
+        <input type="text" id="licenseKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX"
+               style="text-transform:uppercase; letter-spacing:2px; font-size:18px; text-align:center; padding:12px;">
+      </div>
+      <div class="license-gate-actions">
+        <button class="btn btn-primary" onclick="activateLicenseFromGate()">Activate License</button>
+        <a href="https://septic-sewer-report-builder.myshopify.com/products/septic-sewer-inspection-report-builder"
+           target="_blank" class="btn btn-success" style="text-decoration:none;">Buy License &mdash; $69.99</a>
+      </div>
+      <p id="licenseGateError" style="color:#e74c3c;margin-top:12px;display:none;font-size:13px;"></p>
+      <p style="margin-top:20px;font-size:12px;color:#888;">
+        One-time purchase. License works on up to 2 computers.
+      </p>
+    </div>
+  </div>
+
+  <!-- Trial Banner -->
+  <div class="trial-banner" id="trialBanner" style="display:none;">
+    <span id="trialBannerText">7 days left in your free trial</span>
+    <button onclick="showLicenseModal()" style="padding:4px 14px;font-size:12px;background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.4);border-radius:4px;cursor:pointer;">Enter License Key</button>
+  </div>
+
+  <!-- License Key Modal -->
+  <div class="modal-overlay" id="licenseModal">
+    <div class="modal" style="width:480px;">
+      <h2>Activate License</h2>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;">Enter your license key to unlock the full version.</p>
+      <div class="form-group">
+        <label>License Key</label>
+        <input type="text" id="licenseModalKeyInput" placeholder="XXXX-XXXX-XXXX-XXXX"
+               style="text-transform:uppercase; letter-spacing:2px; font-size:16px; text-align:center;">
+      </div>
+      <p id="licenseModalError" style="color:#e74c3c;font-size:13px;display:none;"></p>
+      <p id="licenseModalSuccess" style="color:#27ae60;font-size:13px;display:none;"></p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('licenseModal')">Cancel</button>
+        <button class="btn btn-primary" id="licenseModalActivateBtn" onclick="activateLicenseFromModal()">Activate</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <a href="https://septic-sewer-report-builder.myshopify.com/products/septic-sewer-inspection-report-builder"
+           target="_blank" style="font-size:13px;color:var(--primary);">Don't have a key? Buy one for $69.99</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="top-bar-brand">

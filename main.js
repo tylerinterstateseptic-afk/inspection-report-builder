@@ -26,6 +26,18 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   mainWindow.setMenuBarVisibility(false);
+
+  // Background license revalidation (checks every 30 days when online)
+  mainWindow.webContents.on('did-finish-load', async () => {
+    try {
+      const status = license.getLicenseStatus();
+      if (status.status === 'licensed' && status.needsRevalidation) {
+        await license.validateLicense();
+      }
+    } catch (err) {
+      // Silent fail — don't block the user
+    }
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -211,6 +223,21 @@ ipcMain.handle('load-field-config', async () => {
   const filePath = getUserDataPath('field-config.json');
   if (!fs.existsSync(filePath)) return null;
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+});
+
+// --- License System ---
+const license = require('./license');
+
+ipcMain.handle('get-license-status', async () => {
+  return license.getLicenseStatus();
+});
+
+ipcMain.handle('activate-license', async (event, licenseKey) => {
+  return license.activateLicense(licenseKey);
+});
+
+ipcMain.handle('validate-license', async () => {
+  return license.validateLicense();
 });
 
 // Copy PDF to Google Drive sync folder

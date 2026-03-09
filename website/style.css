@@ -576,6 +576,30 @@ code {
   color: var(--text-primary);
 }
 
+.download-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.download-includes {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.btn-success {
+  background: #27ae60;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: #2ecc71;
+  color: #fff;
+}
+
 .download-note {
   margin-top: 20px;
   font-size: 13px;

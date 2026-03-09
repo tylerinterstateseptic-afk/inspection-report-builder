@@ -7,3 +7,5 @@ saved-reports/
 settings.json
 .claude/
 PLAN.md
+website/.netlify/
+website/netlify/functions/node_modules/

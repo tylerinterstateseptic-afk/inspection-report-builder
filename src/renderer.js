@@ -1057,6 +1057,35 @@ function restoreField(fieldId) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', async () => {
+  // --- License Check (runs first, before anything else) ---
+  try {
+    const licenseStatus = await window.api.getLicenseStatus();
+
+    if (licenseStatus.status === 'expired') {
+      document.getElementById('licenseGate').style.display = 'flex';
+      return; // STOP — app is locked, don't initialize anything
+    }
+
+    if (licenseStatus.status === 'trial') {
+      const banner = document.getElementById('trialBanner');
+      const bannerText = document.getElementById('trialBannerText');
+      banner.style.display = 'flex';
+      const days = licenseStatus.daysRemaining;
+      bannerText.textContent = `${days} day${days !== 1 ? 's' : ''} left in your free trial`;
+
+      if (days <= 1) {
+        banner.classList.add('critical');
+      } else if (days <= 3) {
+        banner.classList.add('warning');
+      }
+    }
+    // If 'licensed' — no banner, no gate, proceed normally
+  } catch (err) {
+    console.error('License check failed:', err);
+    // Fail-open: if license check crashes, allow access
+  }
+
+  // --- Normal app initialization continues ---
   try { settings = await window.api.loadSettings(); } catch (e) { settings = {}; }
 
   // Load field config (or use defaults)
@@ -2139,4 +2168,75 @@ function showToast(message, type = '') {
   toast.textContent = message;
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 4000);
+}
+
+// ===== LICENSE FUNCTIONS =====
+async function activateLicenseFromGate() {
+  const input = document.getElementById('licenseKeyInput');
+  const errorEl = document.getElementById('licenseGateError');
+  const key = input.value.trim();
+
+  if (!key) {
+    errorEl.textContent = 'Please enter a license key.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  errorEl.style.display = 'none';
+  input.disabled = true;
+
+  const result = await window.api.activateLicense(key);
+
+  if (result.success) {
+    document.getElementById('licenseGate').style.display = 'none';
+    showToast('License activated! Welcome to Inspection Report Builder.', 'success');
+    location.reload();
+  } else {
+    errorEl.textContent = result.error;
+    errorEl.style.display = 'block';
+    input.disabled = false;
+  }
+}
+
+async function activateLicenseFromModal() {
+  const input = document.getElementById('licenseModalKeyInput');
+  const errorEl = document.getElementById('licenseModalError');
+  const successEl = document.getElementById('licenseModalSuccess');
+  const btn = document.getElementById('licenseModalActivateBtn');
+  const key = input.value.trim();
+
+  if (!key) {
+    errorEl.textContent = 'Please enter a license key.';
+    errorEl.style.display = 'block';
+    successEl.style.display = 'none';
+    return;
+  }
+
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Activating...';
+
+  const result = await window.api.activateLicense(key);
+
+  if (result.success) {
+    successEl.textContent = 'License activated successfully!';
+    successEl.style.display = 'block';
+    document.getElementById('trialBanner').style.display = 'none';
+    showToast('License activated!', 'success');
+    setTimeout(() => closeModal('licenseModal'), 1500);
+  } else {
+    errorEl.textContent = result.error;
+    errorEl.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Activate';
+}
+
+function showLicenseModal() {
+  document.getElementById('licenseModalKeyInput').value = '';
+  document.getElementById('licenseModalError').style.display = 'none';
+  document.getElementById('licenseModalSuccess').style.display = 'none';
+  showModal('licenseModal');
 }

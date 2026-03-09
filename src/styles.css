@@ -557,6 +557,91 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* --- License Gate (full-screen block) --- */
+.license-gate {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.license-gate-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  width: 500px;
+  max-width: 92%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.license-gate-card h2 {
+  color: var(--primary);
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.license-gate-card > p {
+  color: #555;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.license-gate-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.license-gate-actions .btn {
+  padding: 10px 24px;
+  font-size: 14px;
+}
+
+.btn-success {
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-success:hover {
+  background: #2ecc71;
+}
+
+/* --- Trial Banner --- */
+.trial-banner {
+  background: #2980b9;
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 99;
+  font-weight: 500;
+}
+
+.trial-banner.warning {
+  background: #e67e22;
+}
+
+.trial-banner.critical {
+  background: #e74c3c;
+}
+
 /* --- Drafts List --- */
 .drafts-list {
   list-style: none;
