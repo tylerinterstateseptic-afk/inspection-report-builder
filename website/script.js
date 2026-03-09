@@ -106,3 +106,16 @@ dots.forEach(dot => {
 
 // Start autoplay
 if (slides.length > 0) startAutoplay();
+
+// ===== Install Help Tabs (Windows / Mac) =====
+document.querySelectorAll('.install-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    // Toggle buttons
+    document.querySelectorAll('.install-tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Toggle content
+    document.querySelectorAll('.install-tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('install-tab-' + tab).classList.add('active');
+  });
+});
