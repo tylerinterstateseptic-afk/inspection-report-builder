@@ -1617,11 +1617,11 @@ function buildReportHtml(data) {
 
   let hheHtml = '';
   if (data.hheProvided) {
-    hheHtml = `<p>HHE-200 design was provided and reviewed as part of this inspection.</p>`;
+    hheHtml = `<p>Septic Design was provided and reviewed as part of this inspection.</p>`;
   } else if (data.hheNotProvided) {
-    hheHtml = `<p>HHE-200 design was not provided.</p>
+    hheHtml = `<p>Septic Design was not provided.</p>
       <p style="background:#fef9e7;border:1px solid #f9e79f;padding:8px;border-radius:4px;font-size:13px;color:#7d6608;">
-      Without the HHE-200, the inspector cannot verify the system's approved design capacity, component layout, or whether current use falls within the original design parameters.</p>`;
+      Without the Septic Design, the inspector cannot verify the system's approved design capacity, component layout, or whether current use falls within the original design parameters.</p>`;
   }
 
   const companyName = settings.companyName || 'Your Company';
@@ -1746,7 +1746,7 @@ function buildReportHtml(data) {
 
   ${!(data.hiddenSections || []).includes('hheDesign') ? `
   <div class="section-small">
-  <h2>HHE-200 Design</h2>
+  <h2>Septic Design</h2>
   ${hheHtml}
   </div>
   ` : ''}

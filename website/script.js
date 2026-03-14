@@ -63,7 +63,7 @@ const captionEl = document.getElementById('carouselCaption');
 const captions = [
   'Header Info — Customer & Job Details',
   'Septic Tank — Comprehensive Field Dropdowns',
-  'Leachfield & HHE-200 Design — AI Improve',
+  'Leachfield & Septic Design — AI Improve',
   'Inspection Photos & Recommendations',
   'Email Reports — Auto-Attached PDF Delivery'
 ];
