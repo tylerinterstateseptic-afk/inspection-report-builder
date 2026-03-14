@@ -389,6 +389,19 @@ body {
   text-align: center;
 }
 
+.image-card[draggable="true"] {
+  cursor: grab;
+}
+
+.image-card.dragging {
+  opacity: 0.4;
+}
+
+.image-card.drag-over {
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+}
+
 /* --- Google Drive Links --- */
 .drive-link-row {
   display: flex;

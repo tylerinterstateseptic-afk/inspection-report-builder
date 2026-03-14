@@ -1270,10 +1270,51 @@ function handleFiles(files) {
   }
 }
 
+let dragSrcIndex = null;
+let dragTargetArray = null;
+
+function setupCardDragHandlers(gallery, arr, renderFn) {
+  const cards = gallery.querySelectorAll('.image-card');
+  cards.forEach(card => {
+    card.addEventListener('dragstart', (e) => {
+      dragSrcIndex = parseInt(card.dataset.index);
+      dragTargetArray = arr;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      gallery.querySelectorAll('.image-card').forEach(c => c.classList.remove('drag-over'));
+    });
+    card.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (dragTargetArray === arr) {
+        gallery.querySelectorAll('.image-card').forEach(c => c.classList.remove('drag-over'));
+        card.classList.add('drag-over');
+      }
+    });
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetIndex = parseInt(card.dataset.index);
+      if (dragTargetArray === arr && dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+        const item = arr.splice(dragSrcIndex, 1)[0];
+        arr.splice(targetIndex, 0, item);
+        renderFn();
+      }
+      card.classList.remove('drag-over');
+    });
+  });
+}
+
 function renderImages() {
   const gallery = document.getElementById('imageGallery');
   gallery.innerHTML = images.map((img, i) => `
-    <div class="image-card">
+    <div class="image-card" draggable="true" data-index="${i}" data-gallery="septic">
       <img src="${img.dataUrl}" alt="Photo ${i + 1}">
       <button class="btn-remove" onclick="removeImage(${i})">&times;</button>
       <div class="image-caption">
@@ -1283,6 +1324,7 @@ function renderImages() {
       </div>
     </div>
   `).join('');
+  setupCardDragHandlers(gallery, images, renderImages);
 }
 
 function removeImage(index) {
@@ -1337,7 +1379,7 @@ function handleSewerFiles(files) {
 function renderSewerImages() {
   const gallery = document.getElementById('sewerImageGallery');
   gallery.innerHTML = sewerImages.map((img, i) => `
-    <div class="image-card">
+    <div class="image-card" draggable="true" data-index="${i}" data-gallery="sewer">
       <img src="${img.dataUrl}" alt="Photo ${i + 1}">
       <button class="btn-remove" onclick="removeSewerImage(${i})">&times;</button>
       <div class="image-caption">
@@ -1347,6 +1389,7 @@ function renderSewerImages() {
       </div>
     </div>
   `).join('');
+  setupCardDragHandlers(gallery, sewerImages, renderSewerImages);
 }
 
 function removeSewerImage(index) {
