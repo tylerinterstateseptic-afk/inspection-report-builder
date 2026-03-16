@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -27,6 +27,24 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   mainWindow.setMenuBarVisibility(false);
+
+  // Spellcheck right-click context menu
+  mainWindow.webContents.on('context-menu', (event, params) => {
+    if (params.misspelledWord) {
+      const menuItems = params.dictionarySuggestions.slice(0, 5).map(suggestion => ({
+        label: suggestion,
+        click: () => mainWindow.webContents.replaceMisspelling(suggestion),
+      }));
+      if (menuItems.length > 0) {
+        menuItems.push({ type: 'separator' });
+      }
+      menuItems.push({
+        label: 'Add to Dictionary',
+        click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
+      });
+      Menu.buildFromTemplate(menuItems).popup();
+    }
+  });
 
   // Background license revalidation (checks every 30 days when online)
   mainWindow.webContents.on('did-finish-load', async () => {
