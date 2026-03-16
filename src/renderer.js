@@ -65,6 +65,25 @@ We recommend addressing any concerns identified in this report promptly and cons
 
 By accepting this report, the client acknowledges and accepts the limitations and scope of this inspection and agrees that {companyName} and its inspectors are not responsible for any misinterpretations, inaccuracies, or unforeseen issues that may arise after the inspection.`;
 
+// Default email body templates (uses {name}, {address}, {inspector} placeholders)
+const DEFAULT_SEPTIC_EMAIL_BODY = `Hello,
+
+Please find attached the septic system inspection report for {name}{address}.
+
+Please let me know if you have any questions.
+
+Thank you,
+{inspector}`;
+
+const DEFAULT_SEWER_EMAIL_BODY = `Hello,
+
+Please find attached the sewer camera inspection report for {name}{address}.
+
+Please let me know if you have any questions.
+
+Thank you,
+{inspector}`;
+
 // Map section-body elements to a sectionId for custom field insertion
 const SECTION_IDS = ['headerInfo', 'septicTank', 'leachfield', 'hhe200', 'inspectionPhotos', 'recommendations'];
 
@@ -2040,10 +2059,18 @@ function showEmailModal() {
 
   if (activeTab === 'sewer') {
     document.getElementById('emailSubject').value = `Sewer Camera Inspection Report - ${name}${addr ? ' - ' + addr : ''}`;
-    document.getElementById('emailBody').value = `Hello,\n\nPlease find attached the sewer camera inspection report for ${name}${addr ? ' at ' + addr : ''}.\n\nPlease let me know if you have any questions.\n\nThank you,\n${settings.inspectorName || 'Inspector'}`;
+    const sewerTemplate = settings.sewerEmailBody || DEFAULT_SEWER_EMAIL_BODY;
+    document.getElementById('emailBody').value = sewerTemplate
+      .replace(/\{name\}/g, name || 'Customer')
+      .replace(/\{address\}/g, addr ? ' at ' + addr : '')
+      .replace(/\{inspector\}/g, settings.inspectorName || 'Inspector');
   } else {
     document.getElementById('emailSubject').value = `Septic Inspection Report - ${name}${addr ? ' - ' + addr : ''}`;
-    document.getElementById('emailBody').value = `Hello,\n\nPlease find attached the septic system inspection report for ${name}${addr ? ' at ' + addr : ''}.\n\nPlease let me know if you have any questions.\n\nThank you,\n${settings.inspectorName || 'Inspector'}`;
+    const septicTemplate = settings.septicEmailBody || DEFAULT_SEPTIC_EMAIL_BODY;
+    document.getElementById('emailBody').value = septicTemplate
+      .replace(/\{name\}/g, name || 'Customer')
+      .replace(/\{address\}/g, addr ? ' at ' + addr : '')
+      .replace(/\{inspector\}/g, settings.inspectorName || 'Inspector');
   }
   showModal('emailModal');
 }
@@ -2158,6 +2185,9 @@ async function showSettingsModal() {
   document.getElementById('settingsSmtpPort').value = settings.smtpPort || '587';
   document.getElementById('settingsSmtpUser').value = settings.smtpUser || '';
   document.getElementById('settingsSmtpPass').value = settings.smtpPass || '';
+  // Email Body Templates
+  document.getElementById('settingsSepticEmailBody').value = settings.septicEmailBody || DEFAULT_SEPTIC_EMAIL_BODY;
+  document.getElementById('settingsSewerEmailBody').value = settings.sewerEmailBody || DEFAULT_SEWER_EMAIL_BODY;
   // Google Drive
   document.getElementById('settingsGoogleDriveFolder').value = settings.googleDriveFolder || '';
   // Disclaimers
@@ -2181,6 +2211,8 @@ async function saveSettings() {
     smtpPort: document.getElementById('settingsSmtpPort').value.trim(),
     smtpUser: document.getElementById('settingsSmtpUser').value.trim(),
     smtpPass: document.getElementById('settingsSmtpPass').value.trim(),
+    septicEmailBody: document.getElementById('settingsSepticEmailBody').value,
+    sewerEmailBody: document.getElementById('settingsSewerEmailBody').value,
     googleDriveFolder: document.getElementById('settingsGoogleDriveFolder').value.trim(),
     septicDisclaimer: document.getElementById('settingsSepticDisclaimer').value,
     sewerDisclaimer: document.getElementById('settingsSewerDisclaimer').value,

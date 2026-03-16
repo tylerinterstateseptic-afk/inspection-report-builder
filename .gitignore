@@ -9,3 +9,5 @@ settings.json
 PLAN.md
 website/.netlify/
 website/netlify/functions/node_modules/
+dist-artifacts/
+dist-mac/
