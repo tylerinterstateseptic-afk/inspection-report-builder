@@ -705,6 +705,57 @@ body.edit-mode .tab-bar {
   background: #5c4220;
 }
 
+/* --- Clear Form Button --- */
+.btn-clear-form {
+  background: rgba(231, 76, 60, 0.2) !important;
+  border: 1px solid rgba(231, 76, 60, 0.4) !important;
+  color: #e74c3c !important;
+  transition: all 0.2s !important;
+}
+.btn-clear-form:hover {
+  background: rgba(231, 76, 60, 0.4) !important;
+  color: #fff !important;
+}
+
+/* --- Video Links --- */
+.video-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.video-link-row input {
+  flex: 1;
+}
+.btn-remove-video-link {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.btn-remove-video-link:hover {
+  background: #c0392b;
+}
+.btn-add-video-link {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.btn-add-video-link:hover {
+  opacity: 0.9;
+}
+
 /* Edit pencil button next to dropdowns */
 .edit-field-btn {
   display: none;

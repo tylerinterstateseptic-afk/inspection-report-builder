@@ -8,6 +8,7 @@ let editMode = false;
 let fieldConfig = null;
 let editingDropdownId = null; // which select is being edited
 let editingOptions = []; // temp options list while editing
+let sewerVideoLinks = ['']; // array of video link URLs
 
 // ===== DEFAULT FIELD CONFIG =====
 const DEFAULT_FIELD_CONFIG = {
@@ -1123,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sewerDate').value = new Date().toISOString().split('T')[0];
   setupImageHandling();
   setupSewerImageHandling();
+  renderSewerVideoLinks();
 
   // Show setup wizard on first launch
   if (!settings.setupWizardCompleted) {
@@ -1463,6 +1465,28 @@ function collectFormData() {
   };
 }
 
+// ===== SEWER VIDEO LINKS =====
+function renderSewerVideoLinks() {
+  const container = document.getElementById('sewerVideoLinksContainer');
+  if (!container) return;
+  container.innerHTML = sewerVideoLinks.map((link, i) => `
+    <div class="video-link-row">
+      <input type="text" value="${link.replace(/"/g, '&quot;')}" placeholder="https://drive.google.com/file/d/..." oninput="sewerVideoLinks[${i}] = this.value">
+      ${sewerVideoLinks.length > 1 ? `<button type="button" class="btn-remove-video-link" onclick="removeSewerVideoLink(${i})" title="Remove">✕</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function addSewerVideoLink() {
+  sewerVideoLinks.push('');
+  renderSewerVideoLinks();
+}
+
+function removeSewerVideoLink(index) {
+  sewerVideoLinks.splice(index, 1);
+  renderSewerVideoLinks();
+}
+
 function collectSewerFormData() {
   // Sync captions from DOM before collecting
   const captionInputs = document.querySelectorAll('#sewerImageGallery .image-caption input');
@@ -1476,7 +1500,7 @@ function collectSewerFormData() {
     jobAddress: document.getElementById('sewerJobAddress').value,
     inspectorName: document.getElementById('sewerInspectorName').value,
     inspectionDate: document.getElementById('sewerDate').value,
-    videoLink: document.getElementById('sewerVideoLink').value,
+    videoLinks: sewerVideoLinks.filter(v => v.trim()),
     findings: document.getElementById('sewerFindings').value,
     images: sewerImages,
   };
@@ -1592,7 +1616,15 @@ function restoreSewerFormData(data) {
   document.getElementById('sewerJobAddress').value = data.jobAddress || '';
   document.getElementById('sewerInspectorName').value = data.inspectorName || settings.inspectorName || '';
   document.getElementById('sewerDate').value = data.inspectionDate || '';
-  document.getElementById('sewerVideoLink').value = data.videoLink || '';
+  // Restore video links (support legacy single videoLink and new videoLinks array)
+  if (data.videoLinks && data.videoLinks.length > 0) {
+    sewerVideoLinks = data.videoLinks;
+  } else if (data.videoLink) {
+    sewerVideoLinks = [data.videoLink];
+  } else {
+    sewerVideoLinks = [''];
+  }
+  renderSewerVideoLinks();
   document.getElementById('sewerFindings').value = data.findings || '';
 
   if (data.images) {
@@ -1854,11 +1886,13 @@ function buildSewerReportHtml(data) {
   }
 
   let videoLinkHtml = '';
-  if (data.videoLink) {
+  // Support both legacy single videoLink and new videoLinks array
+  const links = data.videoLinks && data.videoLinks.length > 0 ? data.videoLinks : (data.videoLink ? [data.videoLink] : []);
+  if (links.length > 0) {
     videoLinkHtml = `
       <div style="margin:12px 0;page-break-inside:avoid;">
-        <h2 style="color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:3px;">Video Link</h2>
-        <p style="margin-top:8px;"><a href="${data.videoLink}" style="color:#2980b9;word-break:break-all;">${data.videoLink}</a></p>
+        <h2 style="color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:3px;">Video Link${links.length > 1 ? 's' : ''}</h2>
+        ${links.map((link, i) => `<p style="margin-top:8px;"><a href="${link}" style="color:#2980b9;word-break:break-all;">${link}</a></p>`).join('')}
       </div>
     `;
   }
@@ -2186,10 +2220,17 @@ function clearSewerForm() {
   });
   sewerImages = [];
   renderSewerImages();
+  sewerVideoLinks = [''];
+  renderSewerVideoLinks();
   // Re-set defaults
   document.getElementById('sewerInspectorName').value = settings.inspectorName || '';
   document.getElementById('sewerDate').value = new Date().toISOString().split('T')[0];
   showToast('Form cleared.', 'success');
+}
+
+function clearActiveForm() {
+  if (activeTab === 'sewer') clearSewerForm();
+  else clearForm();
 }
 
 // ===== MODAL HELPERS =====

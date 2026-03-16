@@ -233,6 +233,7 @@
       <button onclick="showSetupWizard()" class="btn-setup-guide">Setup Guide</button>
       <button onclick="showSettingsModal()">Settings</button>
       <button id="editModeBtn" class="btn-edit-mode" onclick="toggleEditMode()">Edit Fields</button>
+      <button onclick="clearActiveForm()" class="btn-clear-form">Clear Form</button>
     </div>
   </div>
 
@@ -539,18 +540,14 @@
         </div>
       </div>
 
-      <!-- ===== VIDEO LINK ===== -->
+      <!-- ===== VIDEO LINKS ===== -->
       <div class="section">
         <div class="section-header" onclick="toggleSection(this)">
-          Video Link <span class="chevron">&#9660;</span>
+          Video Links <span class="chevron">&#9660;</span>
         </div>
         <div class="section-body">
-          <div class="form-row single">
-            <div class="form-group">
-              <label>Google Drive Video Link</label>
-              <input type="text" id="sewerVideoLink" placeholder="https://drive.google.com/file/d/...">
-            </div>
-          </div>
+          <div id="sewerVideoLinksContainer"></div>
+          <button type="button" class="btn-add-video-link" onclick="addSewerVideoLink()">+ Add Video Link</button>
         </div>
       </div>
 
