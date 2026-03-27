@@ -1,6 +1,6 @@
 {
   "name": "inspection-program",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Septic & Sewer Inspection Report Program",
   "main": "main.js",
   "scripts": {

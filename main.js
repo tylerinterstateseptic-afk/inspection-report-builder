@@ -165,8 +165,13 @@ ipcMain.handle('generate-pdf', async (event, { html, outputName }) => {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     const outputPath = path.join(dir, outputName);
 
+    // Write HTML to a temp file to avoid data URL size limits with embedded images
+    const os = require('os');
+    const tmpFile = path.join(os.tmpdir(), `report_${Date.now()}.html`);
+    fs.writeFileSync(tmpFile, html, 'utf-8');
+
     const pdfWindow = new BrowserWindow({ show: false, width: 816, height: 1056 });
-    await pdfWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+    await pdfWindow.loadFile(tmpFile);
 
     // Small delay to ensure images and styles are fully rendered
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -179,6 +184,10 @@ ipcMain.handle('generate-pdf', async (event, { html, outputName }) => {
 
     fs.writeFileSync(outputPath, pdfBuffer);
     pdfWindow.close();
+
+    // Clean up temp file
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+
     return { success: true, path: outputPath };
   } catch (err) {
     return { success: false, error: err.message };

@@ -302,14 +302,42 @@ function openDropdownEditor(selectId) {
 
 function renderOptionList() {
   const list = document.getElementById('optionList');
-  list.innerHTML = editingOptions.map((opt, i) => `
-    <li>
-      <button class="btn-move" style="display:flex${i === 0 ? ';opacity:0.3' : ''}" onclick="moveOption(${i}, -1)" ${i === 0 ? 'disabled' : ''} title="Move up">&#9650;</button>
-      <button class="btn-move" style="display:flex${i === editingOptions.length - 1 ? ';opacity:0.3' : ''}" onclick="moveOption(${i}, 1)" ${i === editingOptions.length - 1 ? 'disabled' : ''} title="Move down">&#9660;</button>
-      <span class="option-text">${opt}</span>
-      <button class="btn-remove-opt" onclick="removeOption(${i})" title="Remove">&times;</button>
-    </li>
-  `).join('');
+  list.innerHTML = '';
+  editingOptions.forEach((opt, i) => {
+    const li = document.createElement('li');
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'btn-move';
+    upBtn.style.cssText = 'display:flex' + (i === 0 ? ';opacity:0.3' : '');
+    upBtn.innerHTML = '&#9650;';
+    upBtn.title = 'Move up';
+    if (i === 0) upBtn.disabled = true;
+    upBtn.addEventListener('click', () => moveOption(i, -1));
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'btn-move';
+    downBtn.style.cssText = 'display:flex' + (i === editingOptions.length - 1 ? ';opacity:0.3' : '');
+    downBtn.innerHTML = '&#9660;';
+    downBtn.title = 'Move down';
+    if (i === editingOptions.length - 1) downBtn.disabled = true;
+    downBtn.addEventListener('click', () => moveOption(i, 1));
+
+    const span = document.createElement('span');
+    span.className = 'option-text';
+    span.textContent = opt;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-remove-opt';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove';
+    removeBtn.addEventListener('click', () => removeOption(i));
+
+    li.appendChild(upBtn);
+    li.appendChild(downBtn);
+    li.appendChild(span);
+    li.appendChild(removeBtn);
+    list.appendChild(li);
+  });
 }
 
 function addOption() {
@@ -407,8 +435,8 @@ function renderCustomFields() {
     row.innerHTML = `
       <div class="form-group">
         <div class="reorder-controls">
-          <button class="btn-move" style="display:inline-block" onclick="moveCustomField('${cf.id}',-1)" title="Move up">&#9650;</button>
-          <button class="btn-move" style="display:inline-block" onclick="moveCustomField('${cf.id}',1)" title="Move down">&#9660;</button>
+          <button class="btn-move btn-move-up" style="display:inline-block" title="Move up">&#9650;</button>
+          <button class="btn-move btn-move-down" style="display:inline-block" title="Move down">&#9660;</button>
         </div>
         <label data-editable="${cf.id}">${cf.label}</label>
         <div class="select-edit-wrapper">
@@ -417,12 +445,17 @@ function renderCustomFields() {
             ${(cf.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}
             <option value="Other">Other</option>
           </select>
-          <button class="edit-field-btn" onclick="event.stopPropagation(); openDropdownEditor('${cf.id}')" title="Edit options">&#9998;</button>
+          <button class="edit-field-btn" title="Edit options">&#9998;</button>
         </div>
         <input type="text" id="${cf.id}Other" class="other-input hidden" placeholder="Specify...">
-        <button class="btn-remove-custom" onclick="removeCustomField('${cf.id}')" title="Remove this field">&times; Remove Field</button>
+        <button class="btn-remove-custom" title="Remove this field">&times; Remove Field</button>
       </div>
     `;
+    // Bind event handlers via DOM (not inline onclick)
+    row.querySelector('.btn-move-up').addEventListener('click', (e) => { e.stopPropagation(); moveCustomField(cf.id, -1); });
+    row.querySelector('.btn-move-down').addEventListener('click', (e) => { e.stopPropagation(); moveCustomField(cf.id, 1); });
+    row.querySelector('.edit-field-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdownEditor(cf.id); });
+    row.querySelector('.btn-remove-custom').addEventListener('click', () => removeCustomField(cf.id));
     if (addBtnRow) sectionBody.insertBefore(row, addBtnRow);
     else sectionBody.appendChild(row);
   });
@@ -441,8 +474,8 @@ function renderCustomSections() {
       <div class="form-row single custom-field-row" data-custom-field="${f.id}">
         <div class="form-group">
           <div class="reorder-controls">
-            <button class="btn-move" style="display:inline-block" onclick="moveCustomSectionField('${cs.id}','${f.id}',-1)" title="Move up">&#9650;</button>
-            <button class="btn-move" style="display:inline-block" onclick="moveCustomSectionField('${cs.id}','${f.id}',1)" title="Move down">&#9660;</button>
+            <button class="btn-move btn-move-up" style="display:inline-block" title="Move up">&#9650;</button>
+            <button class="btn-move btn-move-down" style="display:inline-block" title="Move down">&#9660;</button>
           </div>
           <label data-editable="${f.id}">${f.label}</label>
           <div class="select-edit-wrapper">
@@ -451,23 +484,23 @@ function renderCustomSections() {
               ${(f.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}
               <option value="Other">Other</option>
             </select>
-            <button class="edit-field-btn" onclick="event.stopPropagation(); openDropdownEditor('${f.id}')" title="Edit options">&#9998;</button>
+            <button class="edit-field-btn" title="Edit options">&#9998;</button>
           </div>
           <input type="text" id="${f.id}Other" class="other-input hidden" placeholder="Specify...">
-          <button class="btn-remove-custom" onclick="removeCustomSectionField('${cs.id}','${f.id}')" title="Remove this field">&times; Remove Field</button>
+          <button class="btn-remove-custom" title="Remove this field">&times; Remove Field</button>
         </div>
       </div>
     `).join('');
 
     section.innerHTML = `
-      <div class="section-header" onclick="toggleSection(this)" data-editable="true" data-section="custom_${cs.id}">
+      <div class="section-header" data-editable="true" data-section="custom_${cs.id}">
         ${cs.title} <span class="chevron">&#9660;</span>
       </div>
       <div class="section-body">
         <div class="section-reorder">
-          <button class="btn-move" style="display:inline-block" onclick="moveSectionById('${cs.id}',-1)" title="Move section up">&#9650; Move Up</button>
-          <button class="btn-move" style="display:inline-block" onclick="moveSectionById('${cs.id}',1)" title="Move section down">&#9660; Move Down</button>
-          <button class="btn-move" style="display:inline-block;background:#e74c3c;margin-left:8px;" onclick="hideSection('${cs.id}')" title="Delete section">&#10005; Delete</button>
+          <button class="btn-move btn-section-up" style="display:inline-block" title="Move section up">&#9650; Move Up</button>
+          <button class="btn-move btn-section-down" style="display:inline-block" title="Move section down">&#9660; Move Down</button>
+          <button class="btn-move btn-section-delete" style="display:inline-block;background:#e74c3c;margin-left:8px;" title="Delete section">&#10005; Delete</button>
         </div>
         ${fieldsHtml}
         <div class="form-row single custom-field-row" data-custom-field="notes_${cs.id}">
@@ -477,11 +510,30 @@ function renderCustomSections() {
           </div>
         </div>
         <div class="add-field-row" style="display:none;">
-          <button class="btn btn-add-field" onclick="showAddFieldModal('custom_${cs.id}')">+ Add Field</button>
+          <button class="btn btn-add-field">+ Add Field</button>
         </div>
-        <button class="btn-remove-custom btn-remove-section" onclick="removeCustomSection('${cs.id}')" style="display:none;">&times; Remove Section</button>
+        <button class="btn-remove-custom btn-remove-section" style="display:none;">&times; Remove Section</button>
       </div>
     `;
+
+    // Bind event handlers via DOM (not inline onclick)
+    section.querySelector('.section-header').addEventListener('click', function() { toggleSection(this); });
+    section.querySelector('.btn-section-up').addEventListener('click', (e) => { e.stopPropagation(); moveSectionById(cs.id, -1); });
+    section.querySelector('.btn-section-down').addEventListener('click', (e) => { e.stopPropagation(); moveSectionById(cs.id, 1); });
+    section.querySelector('.btn-section-delete').addEventListener('click', (e) => { e.stopPropagation(); hideSection(cs.id); });
+    section.querySelector('.btn-add-field').addEventListener('click', () => showAddFieldModal('custom_' + cs.id));
+    section.querySelector('.btn-remove-section').addEventListener('click', () => removeCustomSection(cs.id));
+
+    // Bind field-level handlers
+    cs.fields.forEach(f => {
+      const fieldRow = section.querySelector(`[data-custom-field="${f.id}"]`);
+      if (!fieldRow) return;
+      fieldRow.querySelector('.btn-move-up').addEventListener('click', (e) => { e.stopPropagation(); moveCustomSectionField(cs.id, f.id, -1); });
+      fieldRow.querySelector('.btn-move-down').addEventListener('click', (e) => { e.stopPropagation(); moveCustomSectionField(cs.id, f.id, 1); });
+      fieldRow.querySelector('.edit-field-btn').addEventListener('click', (e) => { e.stopPropagation(); openDropdownEditor(f.id); });
+      fieldRow.querySelector('.btn-remove-custom').addEventListener('click', () => removeCustomSectionField(cs.id, f.id));
+    });
+
     // Insert before the actions bar
     const actionsBar = document.querySelector('#septicTab .actions-bar');
     if (actionsBar) actionsBar.parentElement.insertBefore(section, actionsBar);
@@ -502,7 +554,11 @@ function addEditModeButtons() {
     const row = document.createElement('div');
     row.className = 'add-field-row';
     row.style.display = editMode ? '' : 'none';
-    row.innerHTML = `<button class="btn btn-add-field" onclick="showAddFieldModal('${SECTION_IDS[idx]}')">+ Add Field</button>`;
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn btn-add-field';
+    addBtn.textContent = '+ Add Field';
+    addBtn.addEventListener('click', () => showAddFieldModal(SECTION_IDS[idx]));
+    row.appendChild(addBtn);
     body.appendChild(row);
   });
 
@@ -517,7 +573,11 @@ function addEditModeButtons() {
     const btn = document.createElement('div');
     btn.id = 'addSectionBtn';
     btn.style.display = editMode ? '' : 'none';
-    btn.innerHTML = `<button class="btn btn-add-section" onclick="showAddSectionModal()">+ Add New Section</button>`;
+    const sectionBtn = document.createElement('button');
+    sectionBtn.className = 'btn btn-add-section';
+    sectionBtn.textContent = '+ Add New Section';
+    sectionBtn.addEventListener('click', () => showAddSectionModal());
+    btn.appendChild(sectionBtn);
     actionsBar.parentElement.insertBefore(btn, actionsBar);
   }
 }
@@ -698,7 +758,12 @@ function updateEditModeVisibility() {
       restoreBtn.id = 'restoreDeletedBtn';
       restoreBtn.style.textAlign = 'center';
       restoreBtn.style.margin = '8px 0';
-      restoreBtn.innerHTML = '<button class="btn" style="background:#8e44ad;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;" onclick="showRestoreModal()">Restore Deleted Items</button>';
+      const rBtn = document.createElement('button');
+      rBtn.className = 'btn';
+      rBtn.style.cssText = 'background:#8e44ad;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;';
+      rBtn.textContent = 'Restore Deleted Items';
+      rBtn.addEventListener('click', () => showRestoreModal());
+      restoreBtn.appendChild(rBtn);
       const actionsBar = document.querySelector('#septicTab .actions-bar');
       if (actionsBar) actionsBar.parentElement.insertBefore(restoreBtn, actionsBar);
     }
@@ -866,11 +931,33 @@ function addSectionReorderControls() {
     controls.style.justifyContent = 'center';
     controls.style.gap = '8px';
     controls.style.marginBottom = '8px';
-    controls.innerHTML = `
-      <button class="btn-move" style="display:inline-block${isFirst ? ';opacity:0.3' : ''}" onclick="moveSectionById('${sectionId}', -1)" ${isFirst ? 'disabled' : ''} title="Move section up">&#9650; Move Up</button>
-      <button class="btn-move" style="display:inline-block${isLast ? ';opacity:0.3' : ''}" onclick="moveSectionById('${sectionId}', 1)" ${isLast ? 'disabled' : ''} title="Move section down">&#9660; Move Down</button>
-      <button class="btn-move" style="display:inline-block;background:#e74c3c;margin-left:8px;" onclick="hideSection('${sectionId}')" title="Delete section">&#10005; Delete</button>
-    `;
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'btn-move';
+    upBtn.style.cssText = 'display:inline-block' + (isFirst ? ';opacity:0.3' : '');
+    upBtn.innerHTML = '&#9650; Move Up';
+    upBtn.title = 'Move section up';
+    if (isFirst) upBtn.disabled = true;
+    upBtn.addEventListener('click', (e) => { e.stopPropagation(); moveSectionById(sectionId, -1); });
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'btn-move';
+    downBtn.style.cssText = 'display:inline-block' + (isLast ? ';opacity:0.3' : '');
+    downBtn.innerHTML = '&#9660; Move Down';
+    downBtn.title = 'Move section down';
+    if (isLast) downBtn.disabled = true;
+    downBtn.addEventListener('click', (e) => { e.stopPropagation(); moveSectionById(sectionId, 1); });
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-move';
+    delBtn.style.cssText = 'display:inline-block;background:#e74c3c;margin-left:8px;';
+    delBtn.innerHTML = '&#10005; Delete';
+    delBtn.title = 'Delete section';
+    delBtn.addEventListener('click', (e) => { e.stopPropagation(); hideSection(sectionId); });
+
+    controls.appendChild(upBtn);
+    controls.appendChild(downBtn);
+    controls.appendChild(delBtn);
     sectionBody.insertBefore(controls, sectionBody.firstChild);
   });
 }
@@ -1011,30 +1098,6 @@ function showRestoreModal() {
     return;
   }
 
-  let html = '<h3 style="margin-top:0;">Restore Deleted Items</h3>';
-
-  if (hiddenSections.length > 0) {
-    html += '<h4 style="margin-bottom:4px;">Sections</h4>';
-    hiddenSections.forEach(h => {
-      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span style="flex:1;">${h.label}</span>
-        <button class="btn" style="padding:4px 12px;font-size:12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="restoreSection('${h.id}')">Restore</button>
-      </div>`;
-    });
-  }
-
-  if (hiddenFields.length > 0) {
-    html += '<h4 style="margin-bottom:4px;">Fields</h4>';
-    hiddenFields.forEach(h => {
-      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span style="flex:1;">${h.label}</span>
-        <button class="btn" style="padding:4px 12px;font-size:12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="restoreField('${h.id}')">Restore</button>
-      </div>`;
-    });
-  }
-
-  html += '<div style="text-align:right;margin-top:12px;"><button class="btn" onclick="closeModal(\'restoreModal\')">Close</button></div>';
-
   // Create or reuse restore modal
   let modal = document.getElementById('restoreModal');
   if (!modal) {
@@ -1043,7 +1106,71 @@ function showRestoreModal() {
     modal.className = 'modal-overlay';
     document.body.appendChild(modal);
   }
-  modal.innerHTML = `<div class="modal" style="max-width:450px;">${html}</div>`;
+
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal';
+  modalContent.style.maxWidth = '450px';
+
+  const title = document.createElement('h3');
+  title.style.marginTop = '0';
+  title.textContent = 'Restore Deleted Items';
+  modalContent.appendChild(title);
+
+  if (hiddenSections.length > 0) {
+    const h4 = document.createElement('h4');
+    h4.style.marginBottom = '4px';
+    h4.textContent = 'Sections';
+    modalContent.appendChild(h4);
+    hiddenSections.forEach(h => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      const span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = h.label;
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.style.cssText = 'padding:4px 12px;font-size:12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;';
+      btn.textContent = 'Restore';
+      btn.addEventListener('click', () => restoreSection(h.id));
+      row.appendChild(span);
+      row.appendChild(btn);
+      modalContent.appendChild(row);
+    });
+  }
+
+  if (hiddenFields.length > 0) {
+    const h4 = document.createElement('h4');
+    h4.style.marginBottom = '4px';
+    h4.textContent = 'Fields';
+    modalContent.appendChild(h4);
+    hiddenFields.forEach(h => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+      const span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = h.label;
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.style.cssText = 'padding:4px 12px;font-size:12px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;';
+      btn.textContent = 'Restore';
+      btn.addEventListener('click', () => restoreField(h.id));
+      row.appendChild(span);
+      row.appendChild(btn);
+      modalContent.appendChild(row);
+    });
+  }
+
+  const closeRow = document.createElement('div');
+  closeRow.style.cssText = 'text-align:right;margin-top:12px;';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'btn';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', () => closeModal('restoreModal'));
+  closeRow.appendChild(closeBtn);
+  modalContent.appendChild(closeRow);
+
+  modal.innerHTML = '';
+  modal.appendChild(modalContent);
   modal.classList.add('active');
 }
 
@@ -1334,17 +1461,25 @@ function setupCardDragHandlers(gallery, arr, renderFn) {
 
 function renderImages() {
   const gallery = document.getElementById('imageGallery');
-  gallery.innerHTML = images.map((img, i) => `
-    <div class="image-card" draggable="true" data-index="${i}" data-gallery="septic">
+  gallery.innerHTML = '';
+  images.forEach((img, i) => {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    card.draggable = true;
+    card.dataset.index = i;
+    card.dataset.gallery = 'septic';
+    card.innerHTML = `
       <img src="${img.dataUrl}" alt="Photo ${i + 1}">
-      <button class="btn-remove" onclick="removeImage(${i})">&times;</button>
+      <button class="btn-remove">&times;</button>
       <div class="image-caption">
         <label>Caption:</label>
-        <input type="text" placeholder="Describe this photo..." value="${img.caption}"
-               oninput="images[${i}].caption = this.value">
+        <input type="text" placeholder="Describe this photo..." value="${img.caption}">
       </div>
-    </div>
-  `).join('');
+    `;
+    card.querySelector('.btn-remove').addEventListener('click', () => removeImage(i));
+    card.querySelector('.image-caption input').addEventListener('input', (e) => { images[i].caption = e.target.value; });
+    gallery.appendChild(card);
+  });
   setupCardDragHandlers(gallery, images, renderImages);
 }
 
@@ -1399,17 +1534,25 @@ function handleSewerFiles(files) {
 
 function renderSewerImages() {
   const gallery = document.getElementById('sewerImageGallery');
-  gallery.innerHTML = sewerImages.map((img, i) => `
-    <div class="image-card" draggable="true" data-index="${i}" data-gallery="sewer">
+  gallery.innerHTML = '';
+  sewerImages.forEach((img, i) => {
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    card.draggable = true;
+    card.dataset.index = i;
+    card.dataset.gallery = 'sewer';
+    card.innerHTML = `
       <img src="${img.dataUrl}" alt="Photo ${i + 1}">
-      <button class="btn-remove" onclick="removeSewerImage(${i})">&times;</button>
+      <button class="btn-remove">&times;</button>
       <div class="image-caption">
         <label>Caption:</label>
-        <input type="text" placeholder="Describe this photo..." value="${img.caption}"
-               oninput="sewerImages[${i}].caption = this.value">
+        <input type="text" placeholder="Describe this photo..." value="${img.caption}">
       </div>
-    </div>
-  `).join('');
+    `;
+    card.querySelector('.btn-remove').addEventListener('click', () => removeSewerImage(i));
+    card.querySelector('.image-caption input').addEventListener('input', (e) => { sewerImages[i].caption = e.target.value; });
+    gallery.appendChild(card);
+  });
   setupCardDragHandlers(gallery, sewerImages, renderSewerImages);
 }
 
@@ -1488,12 +1631,27 @@ function collectFormData() {
 function renderSewerVideoLinks() {
   const container = document.getElementById('sewerVideoLinksContainer');
   if (!container) return;
-  container.innerHTML = sewerVideoLinks.map((link, i) => `
-    <div class="video-link-row">
-      <input type="text" value="${link.replace(/"/g, '&quot;')}" placeholder="https://drive.google.com/file/d/..." oninput="sewerVideoLinks[${i}] = this.value">
-      ${sewerVideoLinks.length > 1 ? `<button type="button" class="btn-remove-video-link" onclick="removeSewerVideoLink(${i})" title="Remove">✕</button>` : ''}
-    </div>
-  `).join('');
+  container.innerHTML = '';
+  sewerVideoLinks.forEach((link, i) => {
+    const row = document.createElement('div');
+    row.className = 'video-link-row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = link;
+    input.placeholder = 'https://drive.google.com/file/d/...';
+    input.addEventListener('input', (e) => { sewerVideoLinks[i] = e.target.value; });
+    row.appendChild(input);
+    if (sewerVideoLinks.length > 1) {
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'btn-remove-video-link';
+      removeBtn.title = 'Remove';
+      removeBtn.textContent = '\u2715';
+      removeBtn.addEventListener('click', () => removeSewerVideoLink(i));
+      row.appendChild(removeBtn);
+    }
+    container.appendChild(row);
+  });
 }
 
 function addSewerVideoLink() {
@@ -2131,15 +2289,22 @@ async function showDraftsModal() {
     list.innerHTML = '<li style="color: var(--text-light); justify-content: center;">No saved drafts.</li>';
     return;
   }
-  list.innerHTML = drafts.map(d => `
-    <li onclick="loadDraft('${d.filename}')">
-      <div>
-        <div class="draft-name">${d.filename.replace('.json', '').replace(/_/g, ' ')}</div>
-        <div class="draft-date">${new Date(d.modified).toLocaleString()}</div>
-      </div>
-      <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="event.stopPropagation(); deleteDraft('${d.filename}')">Delete</button>
-    </li>
-  `).join('');
+  list.innerHTML = '';
+  drafts.forEach(d => {
+    const li = document.createElement('li');
+    li.addEventListener('click', () => loadDraft(d.filename));
+    const info = document.createElement('div');
+    info.innerHTML = `<div class="draft-name">${d.filename.replace('.json', '').replace(/_/g, ' ')}</div>
+      <div class="draft-date">${new Date(d.modified).toLocaleString()}</div>`;
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-danger';
+    delBtn.style.cssText = 'padding:4px 10px;font-size:12px;';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteDraft(d.filename); });
+    li.appendChild(info);
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
 }
 
 async function loadDraft(filename) {
